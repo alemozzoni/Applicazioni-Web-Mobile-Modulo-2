@@ -165,14 +165,18 @@ const Statistics = ({ transactions, tags }) => {
     ]
   };
 
+
+  const filteredTags = Object.keys(stats.byTag)
+    .filter(t => stats.byTag[t]?.expense > 0)
+
   // Category pie chart data
   const categoryChartData = {
-    labels: Object.keys(stats.byTag),
+    labels: filteredTags,
     datasets: [
       {
         label: 'Spese per Categoria',
-        data: Object.keys(stats.byTag).map(t => stats.byTag[t].expense),
-        backgroundColor: Object.keys(stats.byTag).map(t => stats.byTag[t].color),
+        data: filteredTags.map(t => stats.byTag[t].expense),
+        backgroundColor: filteredTags.map(t => stats.byTag[t].color),
       }
     ]
   };
