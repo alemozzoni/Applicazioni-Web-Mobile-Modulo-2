@@ -53,17 +53,21 @@ module.exports = (sequelize) => {
     return values;
   };
 
-  // Associations
-  User.associate = (models) => {
-    User.hasMany(models.Transaction, {
-      foreignKey: 'user_id',
-      as: 'transactions'
-    });
-    User.hasMany(models.Tag, {
-      foreignKey: 'user_id',
-      as: 'tags'
-    });
-  };
+    User.associate = (models) => {
+        User.hasMany(models.Transaction, {
+            foreignKey: 'user_id',
+            as: 'transactions'
+        });
+        User.hasMany(models.Tag, {
+            foreignKey: 'user_id',
+            as: 'tags'
+        });
+        // NUOVO: relazione con RefreshToken
+        User.hasMany(models.RefreshToken, {
+            foreignKey: 'user_id',
+            as: 'refreshTokens'
+        });
+    };
 
   return User;
 };
