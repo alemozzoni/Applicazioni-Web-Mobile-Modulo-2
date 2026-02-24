@@ -261,7 +261,7 @@ exports.getSessions = async (req, res) => {
         const sessions = await RefreshToken.findAll({
             where: {
                 user_id: req.user.id,
-                expires_at: { [Op.gt]: new Date() }  // Solo token non scaduti
+                expires_at: {[Op.gt]: new Date()}  // Solo token non scaduti
             },
             attributes: ['id', 'device_info', 'expires_at', 'created_at'],
             order: [['created_at', 'DESC']]
@@ -281,6 +281,7 @@ exports.getSessions = async (req, res) => {
             message: 'Server error'
         });
     }
+};
     // GET ME
     exports.getMe = async (req, res) => {
         try {
@@ -401,5 +402,4 @@ exports.getSessions = async (req, res) => {
                 message: 'Server error during account deletion'
             });
         }
-    };
     };
