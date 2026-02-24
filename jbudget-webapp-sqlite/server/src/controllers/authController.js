@@ -281,4 +281,125 @@ exports.getSessions = async (req, res) => {
             message: 'Server error'
         });
     }
-};
+    // GET ME
+    exports.getMe = async (req, res) => {
+        try {
+            res.json({
+                success: true,
+                data: req.user.toJSON()
+            });
+        } catch (error) {
+            console.error('GetMe error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Server error'
+            });
+        }
+    };
+
+// UPDATE PROFILE
+    exports.updateProfile = async (req, res) => {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({
+                    success: false,
+                    errors: errors.array()
+                });
+            }
+
+            const { name, email } = req.body;
+            const user = req.user;
+
+            if (email && email !== user.email) {
+                const existingUser = await User.findOne({ where: { email } });
+                if (existingUser) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'Email already in use'
+                    });
+                }
+                user.email = email;
+            }
+
+            if (name) {
+                user.name = name;
+            }
+
+            await user.save();
+
+            res.json({
+                success: true,
+                data: user.toJSON()
+            });
+        } catch (error) {
+            console.error('Update profile error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Server error during profile update'
+            });
+        }
+    };
+
+// UPDATE PASSWORD
+    exports.updatePassword = async (req, res) => {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({
+                    success: false,
+                    errors: errors.array()
+                });
+            }
+
+            const { currentPassword, newPassword } = req.body;
+            const user = req.user;
+
+            const isMatch = await user.validatePassword(currentPassword);
+            if (!isMatch) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Current password is incorrect'
+                });
+            }
+
+            user.password = newPassword;
+            await user.save();
+
+            res.json({
+                success: true,
+                message: 'Password updated successfully'
+            });
+        } catch (error) {
+            console.error('Update password error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Server error during password update'
+            });
+        }
+    };
+
+// DELETE ACCOUNT
+    exports.deleteAccount = async (req, res) => {
+        try {
+            const userId = req.user.id;
+            const { Transaction, Tag, RefreshToken } = require('../models');
+
+            await RefreshToken.destroy({ where: { user_id: userId } });
+            await Transaction.destroy({ where: { user_id: userId } });
+            await Tag.destroy({ where: { user_id: userId } });
+            await User.destroy({ where: { id: userId } });
+
+            res.json({
+                success: true,
+                message: 'Account deleted successfully'
+            });
+        } catch (error) {
+            console.error('Delete account error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Server error during account deletion'
+            });
+        }
+    };
+    };
