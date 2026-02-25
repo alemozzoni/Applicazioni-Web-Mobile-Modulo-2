@@ -18,7 +18,6 @@ build/
 .idea/
 *.swp
 *.swo
-*~
 
 # OS
 .DS_Store
@@ -36,4 +35,3 @@ coverage/
 .cache/
 
 
-.idea/
